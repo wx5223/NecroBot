@@ -38,10 +38,20 @@ namespace PoGo.NecroBot.Logic.Tasks
                 {
                     return;
                 }
+
+                var allitems = await session.Inventory.GetItems();
+                var pokeBallsCount = allitems.FirstOrDefault(i => i.ItemId == ItemId.ItemPokeBall)?.Count;
+                var greatBallsCount = allitems.FirstOrDefault(i => i.ItemId == ItemId.ItemGreatBall)?.Count;
+                var ultraBallsCount = allitems.FirstOrDefault(i => i.ItemId == ItemId.ItemUltraBall)?.Count;
+                var masterBallsCount = allitems.FirstOrDefault(i => i.ItemId == ItemId.ItemMasterBall)?.Count;
+
+                /*
+>>>>>>> refs/remotes/NECROBOTIO/master
                 var pokeBallsCount = await session.Inventory.GetItemAmountByType(ItemId.ItemPokeBall);
                 var greatBallsCount = await session.Inventory.GetItemAmountByType(ItemId.ItemGreatBall);
                 var ultraBallsCount = await session.Inventory.GetItemAmountByType(ItemId.ItemUltraBall);
                 var masterBallsCount = await session.Inventory.GetItemAmountByType(ItemId.ItemMasterBall);
+                */
 
                 if (pokeBallsCount + greatBallsCount + ultraBallsCount + masterBallsCount == 0)
                 {
@@ -58,7 +68,7 @@ namespace PoGo.NecroBot.Logic.Tasks
 
                 var distance = LocationUtils.CalculateDistanceInMeters(session.Client.CurrentLatitude,
                     session.Client.CurrentLongitude, pokemon.Latitude, pokemon.Longitude);
-                await Task.Delay(distance > 100 ? 3000 : 500, cancellationToken);
+                await Task.Delay(distance > 100 ? 500 : 100, cancellationToken);
 
                 var encounter =
                     await session.Client.Encounter.EncounterPokemon(pokemon.EncounterId, pokemon.SpawnPointId);
