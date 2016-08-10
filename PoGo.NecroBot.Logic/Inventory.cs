@@ -28,6 +28,8 @@ namespace PoGo.NecroBot.Logic
         private readonly ILogicSettings _logicSettings;
         private GetPlayerResponse _player = null;
         private int _level = 0;
+        private DownloadItemTemplatesResponse _templates;
+        private IEnumerable<PokemonSettings> _pokemonSettings;
 
         private readonly List<ItemId> _revives = new List<ItemId> { ItemId.ItemRevive, ItemId.ItemMaxRevive };
         private GetInventoryResponse _cachedInventory;
@@ -238,7 +240,7 @@ namespace PoGo.NecroBot.Logic
                 .FirstOrDefault();
         }
 
-        public async Task<int> GetStarDust()
+        public int GetStarDust()
         {
             GetPlayerData();
             return _player.PlayerData.Currencies[1].Amount;
@@ -377,13 +379,23 @@ namespace PoGo.NecroBot.Logic
                 inventory.InventoryDelta.InventoryItems.Select(i => i.InventoryItemData?.PokemonData)
                     .Where(p => p != null && p.PokemonId > 0);
         }
+        public async Task<IEnumerable<PokemonData>> GetFaveriotPokemon()
+        {
+            var inventory = await GetPokemons();
+            return
+                inventory.Where(i => i.Favorite == 1);
+
+        }
 
         public async Task<IEnumerable<PokemonSettings>> GetPokemonSettings()
         {
-            var templates = await _client.Download.GetItemTemplates();
-            return
-                templates.ItemTemplates.Select(i => i.PokemonSettings)
-                    .Where(p => p != null && p.FamilyId != PokemonFamilyId.FamilyUnset);
+            if (_templates == null || _pokemonSettings == null)
+            {
+                _templates = await _client.Download.GetItemTemplates();
+                _pokemonSettings = _templates.ItemTemplates.Select(i => i.PokemonSettings).Where(p => p != null && p.FamilyId != PokemonFamilyId.FamilyUnset);
+            }
+
+            return _pokemonSettings;
         }
 
         public async Task<IEnumerable<PokemonData>> GetPokemonToEvolve(IEnumerable<PokemonId> filter = null)
