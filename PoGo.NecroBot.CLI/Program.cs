@@ -15,8 +15,6 @@ using System.Net;
 using PoGo.NecroBot.CLI.Resources;
 using System.Reflection;
 using PoGo.NecroBot.Logic.Tasks.custom;
-using PoGo.NecroBot.CLI.Plugin;
-using System.Net.Http;
 
 #endregion
 
@@ -47,8 +45,7 @@ namespace PoGo.NecroBot.CLI
             if (args.Length > 0)
                 subPath = args[0];
 
-            var logger = new ConsoleLogger(LogLevel.LevelUp);
-            Logger.SetLogger(logger, subPath);
+            Logger.SetLogger(new ConsoleLogger(LogLevel.SoftBan), subPath);
 
             if (CheckKillSwitch())
                 return;
@@ -62,10 +59,7 @@ namespace PoGo.NecroBot.CLI
 
             if (File.Exists(configFile))
             {
-                if (!VersionCheckState.IsLatest())
-                    settings = GlobalSettings.Load(subPath, true);
-                else
-                    settings = GlobalSettings.Load(subPath);
+                settings = GlobalSettings.Load(subPath);
             }
             else
             {
@@ -165,16 +159,7 @@ namespace PoGo.NecroBot.CLI
                 var websocket = new WebSocketInterface(settings.WebSocketPort, session);
                 session.EventDispatcher.EventReceived += evt => websocket.Listen(evt, session);
             }
-
-            var plugins = new PluginManager(new PluginInitializerInfo()
-            {
-                Logger = logger,
-                Session = session,
-                Settings = settings,
-                Statistics = stats
-            });
-            plugins.InitPlugins();
-
+            
             ProgressBar.fill(70);
 
             machine.SetFailureState(new LoginState());
