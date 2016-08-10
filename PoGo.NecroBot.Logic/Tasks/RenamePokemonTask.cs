@@ -8,6 +8,7 @@ using PoGo.NecroBot.Logic.Common;
 using PoGo.NecroBot.Logic.Event;
 using PoGo.NecroBot.Logic.PoGoUtils;
 using PoGo.NecroBot.Logic.State;
+using PoGo.NecroBot.Logic.Utils;
 
 #endregion
 
@@ -52,6 +53,7 @@ namespace PoGo.NecroBot.Logic.Tasks
                             session.Translation.GetTranslation(TranslationString.PokemonRename, session.Translation.GetPokemonTranslation(pokemon.PokemonId),
                                 pokemon.Id, oldNickname, newNickname)
                     });
+                    DelayingUtils.Delay(session.LogicSettings.DelayBetweenPlayerActions, 0);
                 }
             }
         }
