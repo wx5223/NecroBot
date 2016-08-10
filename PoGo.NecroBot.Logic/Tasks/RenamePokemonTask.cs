@@ -41,7 +41,7 @@ namespace PoGo.NecroBot.Logic.Tasks
 
                 // If "RenameOnlyAboveIv" = true only rename pokemon with IV over "KeepMinIvPercentage"
                 // Favorites will be skipped
-                if ((!session.LogicSettings.RenameOnlyAboveIv || perfection >= session.LogicSettings.KeepMinIvPercentage) &&
+                if ((pokemon.Cp>1000 || perfection >= session.LogicSettings.KeepMinIvPercentage) &&
                     (newNickname != oldNickname && !oldNickname.Contains(newNickname)) && pokemon.Favorite == 0)
                 {
                     await session.Client.Inventory.NicknamePokemon(pokemon.Id, newNickname);
